@@ -59,39 +59,59 @@ internal class MainWindowViewModel
     #region Candles
     public ObservableCollection<Candle> Candles { get; } = new ObservableCollection<Candle>();
 
-    private string _cnadlePair = "BTCUSD";
+    private string _candlePair = "BTCUSD";
     public string CandlePair
     {
-        get => _cnadlePair;
-        set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CandlePair)));
+        get => _candlePair;
+        set
+        {
+            _candlePair = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CandlePair)));
+        } 
     }
 
     private int _periodInSec = 300;
     public int PeriodInSec
     {
         get => _periodInSec;
-        set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PeriodInSec)));
+        set
+        {
+            _periodInSec = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PeriodInSec)));
+        }
     }
 
     private DateTimeOffset _from = new(DateTime.Now - TimeSpan.FromMinutes(10), TimeZoneInfo.Local.GetUtcOffset(DateTime.Now));
     public DateTimeOffset From
     {
         get => _from;
-        set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(From)));
+        set
+        {
+            _from = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(From)));
+        }
     }
 
     private DateTimeOffset _to = new(DateTime.Now, TimeZoneInfo.Local.GetUtcOffset(DateTime.Now));
     public DateTimeOffset To
     {
         get => _to;
-        set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(To)));
+        set
+        {
+            _to = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(To)));
+        }
     }
 
     private long? _count = 100;
     public long? Count
     {
         get => _count;
-        set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+        set
+        {
+            _count = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+        }
     }
 
     public ICommand FetchCandlesCommand { get; }
