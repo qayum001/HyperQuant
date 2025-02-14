@@ -5,8 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HyperQuant"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="600" Width="1000">
     <Grid>
-
+        <StackPanel>
+            <TextBox Text="{Binding TradePair, UpdateSourceTrigger=PropertyChanged}" 
+                     Width="150" Margin="10"/>
+            <TextBox Text="{Binding MaxTrades, UpdateSourceTrigger=PropertyChanged}" 
+                     Width="150" Margin="10"/>
+            <Button Content="Fetch Trades" Command="{Binding FetchTradesCommand}" Margin="10"/>
+            <ListView ItemsSource="{Binding Trades}" Margin="10" Height="400">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="ID" DisplayMemberBinding="{Binding Id}" Width="150"/>
+                        <GridViewColumn Header="Pair" DisplayMemberBinding="{Binding Pair}" Width="150"/>
+                        <GridViewColumn Header="Amount" DisplayMemberBinding="{Binding Amount}" Width="150"/>
+                        <GridViewColumn Header="Side" DisplayMemberBinding="{Binding Side}" Width="150"/>
+                        <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="150"/>
+                        <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price}" Width="100"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+        </StackPanel>
     </Grid>
 </Window>

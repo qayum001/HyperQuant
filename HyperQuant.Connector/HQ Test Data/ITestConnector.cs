@@ -1,29 +1,26 @@
 ﻿using TestHQ;
 
-namespace ConnectorTest
+namespace ConnectorTest;
+
+public interface ITestConnector
 {
-    interface ITestConnector
-    {
-        #region Rest
+    #region Rest
 
-        Task<IEnumerable<Trade>> GetNewTradesAsync(string pair, int maxCount);
-        Task<IEnumerable<Candle>> GetCandleSeriesAsync(string pair, int periodInSec, DateTimeOffset? from, DateTimeOffset? to = null, long? count = 0);
+    Task<IEnumerable<Trade>> GetNewTradesAsync(string pair, int maxCount);
+    Task<IEnumerable<Candle>> GetCandleSeriesAsync(string pair, int periodInSec, DateTimeOffset? from, DateTimeOffset? to = null, long? count = 0);
 
-        #endregion
+    #endregion
 
-        #region Socket
+    #region Socket
 
+    event Action<Trade> NewBuyTrade;
+    event Action<Trade> NewSellTrade;
+    void SubscribeTrades(string pair, int maxCount = 100);
+    void UnsubscribeTrades(string pair);
 
-        event Action<Trade> NewBuyTrade;
-        event Action<Trade> NewSellTrade;
-        void SubscribeTrades(string pair, int maxCount = 100);
-        void UnsubscribeTrades(string pair);
+    event Action<Candle> CandleSeriesProcessing;
+    void SubscribeCandles(string pair, int periodInSec, DateTimeOffset? from = null, DateTimeOffset? to = null, long? count = 0);
+    void UnsubscribeCandles(string pair);
 
-        event Action<Candle> CandleSeriesProcessing;
-        void SubscribeCandles(string pair, int periodInSec, DateTimeOffset? from = null, DateTimeOffset? to = null, long? count = 0);
-        void UnsubscribeCandles(string pair);
-
-        #endregion
-
-    }
+    #endregion
 }

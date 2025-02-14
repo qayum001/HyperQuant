@@ -20,5 +20,10 @@ namespace HyperQuant
         {
             InitializeComponent();
         }
+
+        private void ListView_Scroll(object sender, System.Windows.Controls.Primitives.ScrollEventArgs e)
+        {
+
+        }
     }
 }
