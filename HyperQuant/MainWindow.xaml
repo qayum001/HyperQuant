@@ -5,8 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:HyperQuant"
         mc:Ignorable="d"
-        Title="MainWindow" Height="600" Width="1000">
+        Title="MainWindow" Height="1000" Width="1000">
+    <Window.Resources>
+        <local:DateTimeOffsetToDateTimeConverter x:Key="DateTimeOffsetConverter"/>
+    </Window.Resources>
     <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
         <StackPanel>
             <TextBox Text="{Binding TradePair, UpdateSourceTrigger=PropertyChanged}" 
                      Width="150" Margin="10"/>
@@ -22,6 +30,25 @@
                         <GridViewColumn Header="Side" DisplayMemberBinding="{Binding Side}" Width="150"/>
                         <GridViewColumn Header="Time" DisplayMemberBinding="{Binding Time}" Width="150"/>
                         <GridViewColumn Header="Price" DisplayMemberBinding="{Binding Price}" Width="100"/>
+                    </GridView>
+                </ListView.View>
+            </ListView>
+            <TextBox Width="100" Text="{Binding CandlePair, UpdateSourceTrigger=PropertyChanged}"/>
+            <TextBox Width="100" Text="{Binding PeriodInSec, UpdateSourceTrigger=PropertyChanged}"/>
+            <DatePicker SelectedDate="{Binding From, Mode=TwoWay, Converter={StaticResource DateTimeOffsetConverter}}"/>
+            <DatePicker SelectedDate="{Binding To, Mode=TwoWay, Converter={StaticResource DateTimeOffsetConverter}}"/>
+            <TextBox Width="100" Text="{Binding Count, UpdateSourceTrigger=PropertyChanged}"/>
+            <Button Content="Fetch" Command="{Binding FetchCandlesCommand}" Margin="5"/>
+
+            <ListView ItemsSource="{Binding Candles}" Margin="10" Height="400">
+                <ListView.View>
+                    <GridView>
+                        <GridViewColumn Header="Time" DisplayMemberBinding="{Binding OpenTime}" Width="150"/>
+                        <GridViewColumn Header="Open" DisplayMemberBinding="{Binding OpenPrice}" Width="100"/>
+                        <GridViewColumn Header="High" DisplayMemberBinding="{Binding HighPrice}" Width="100"/>
+                        <GridViewColumn Header="Low" DisplayMemberBinding="{Binding LowPrice}" Width="100"/>
+                        <GridViewColumn Header="Close" DisplayMemberBinding="{Binding ClosePrice}" Width="100"/>
+                        <GridViewColumn Header="Total" DisplayMemberBinding="{Binding TotalPrice}" Width="100"/>
                     </GridView>
                 </ListView.View>
             </ListView>

@@ -10,6 +10,7 @@ namespace HyperQuant;
 internal class MainWindowViewModel
 {
     private readonly ITestConnector _connector;
+    #region Trades   
     public ObservableCollection<Trade> Trades { get; } = [];
 
     public ICommand FetchTradesCommand { get; }
@@ -41,7 +42,8 @@ internal class MainWindowViewModel
     public MainWindowViewModel(ITestConnector connector)
     {
         _connector = connector; 
-        FetchTradesCommand = new RelayCommand(async () => await FetchTradesAsync());
+        FetchTradesCommand = new RelayCommand(FetchTradesAsync);
+        FetchCandlesCommand = new RelayCommand(FetchCandlesAsync);
     }
 
     private async Task FetchTradesAsync()
@@ -52,4 +54,54 @@ internal class MainWindowViewModel
         foreach (var item in trades)
             Trades.Add(item);
     }
+    #endregion
+
+    #region Candles
+    public ObservableCollection<Candle> Candles { get; } = new ObservableCollection<Candle>();
+
+    private string _cnadlePair = "BTCUSD";
+    public string CandlePair
+    {
+        get => _cnadlePair;
+        set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(CandlePair)));
+    }
+
+    private int _periodInSec = 300;
+    public int PeriodInSec
+    {
+        get => _periodInSec;
+        set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(PeriodInSec)));
+    }
+
+    private DateTimeOffset _from = new(DateTime.Now - TimeSpan.FromMinutes(10), TimeZoneInfo.Local.GetUtcOffset(DateTime.Now));
+    public DateTimeOffset From
+    {
+        get => _from;
+        set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(From)));
+    }
+
+    private DateTimeOffset _to = new(DateTime.Now, TimeZoneInfo.Local.GetUtcOffset(DateTime.Now));
+    public DateTimeOffset To
+    {
+        get => _to;
+        set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(To)));
+    }
+
+    private long? _count = 100;
+    public long? Count
+    {
+        get => _count;
+        set => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(Count)));
+    }
+
+    public ICommand FetchCandlesCommand { get; }
+    private async Task FetchCandlesAsync()
+    {
+        var cangles = await _connector.GetCandleSeriesAsync(CandlePair, PeriodInSec, From, To, Count);
+        Candles.Clear();
+
+        foreach (var c in cangles)
+            Candles.Add(c);
+    }
+    #endregion
 }
