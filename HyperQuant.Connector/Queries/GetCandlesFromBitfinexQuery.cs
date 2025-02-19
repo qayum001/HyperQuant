@@ -1,4 +1,5 @@
-﻿using MediatR;
+﻿using HyperQuant.Connector.Utils;
+using MediatR;
 using RestSharp;
 using TestHQ;
 
@@ -19,7 +20,7 @@ internal class GetCandlesFromBitfinexQueryHandler(IHttpClientFactory httpClientF
 
         var rClient = new RestClient(client);
 
-        var rRequest = new RestRequest($"candles/trade:{GetPeriod(request.PeriodInSec)}:t{request.Pair}/hist");
+        var rRequest = new RestRequest($"candles/trade:{TimeUtils.GetPeriodFromSeconds(request.PeriodInSec)}:t{request.Pair}/hist");
 
         if (request.From is not null)
             rRequest.AddParameter("start", request.From.ToString());
@@ -51,11 +52,5 @@ internal class GetCandlesFromBitfinexQueryHandler(IHttpClientFactory httpClientF
         }
 
         return result;
-    }
-
-    private static string GetPeriod(int seconds)
-    {
-        //TODO: make correct way to get period
-        return "5m";
     }
 }

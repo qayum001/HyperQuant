@@ -2,6 +2,8 @@
 using HyperQuant.Commands;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Windows.Data;
 using System.Windows.Input;
 using TestHQ;
 
@@ -41,11 +43,23 @@ internal class MainWindowViewModel
 
     public MainWindowViewModel(ITestConnector connector)
     {
-        _connector = connector; 
+        _connector = connector;
         FetchTradesCommand = new RelayCommand(FetchTradesAsync);
         FetchCandlesCommand = new RelayCommand(FetchCandlesAsync);
-    }
+        SubscribeToTradesCommand = new RelayCommand(SubscribeToTrades);
+        SubscribeToCandlesCommand = new RelayCommand(SubscribeToCandles);
 
+        UnsubscribeFromTradesCommand = new RelayCommand(UnsubscribeFromTrades);
+        UnsubscribeFromCandlesCommand = new RelayCommand(UnsubscribeFromCandles);
+
+        BindingOperations.EnableCollectionSynchronization(WsTrades, this);
+        BindingOperations.EnableCollectionSynchronization(WsCandles, this);
+
+        _connector.NewBuyTrade += WsTrades.Add;
+        _connector.NewSellTrade += WsTrades.Add;
+        _connector.CandleSeriesProcessing += WsCandles.Add;
+    }
+        
     private async Task FetchTradesAsync()
     {
         var trades = await _connector.GetNewTradesAsync(TradePair, MaxTrades);
@@ -122,6 +136,72 @@ internal class MainWindowViewModel
 
         foreach (var c in cangles)
             Candles.Add(c);
+    }
+    #endregion
+
+    #region Websocket trades
+
+    public ICommand SubscribeToTradesCommand { get; }
+
+    public ObservableCollection<Trade> WsTrades { get; } = [];
+    private async Task SubscribeToTrades()
+    {
+        _connector.SubscribeTrades(WsTradePair);
+    }
+
+    public ICommand UnsubscribeFromTradesCommand { get; }
+    private async Task UnsubscribeFromTrades()
+    {
+        _connector.UnsubscribeTrades(WsTradePair);
+        WsTrades.Clear();
+    }
+
+    public ICommand SubscribeToCandlesCommand { get; }
+    public ObservableCollection<Candle> WsCandles { get; } = [];
+    public async Task SubscribeToCandles()
+    {
+        _connector.SubscribeCandles(WsCandlePair, WsCandlePeriod);
+    }
+
+    public ICommand UnsubscribeFromCandlesCommand { get; }
+
+    private async Task UnsubscribeFromCandles()
+    {
+        _connector.UnsubscribeCandles(WsTradePair);
+        WsCandles.Clear();
+    }
+
+    private string _wsTradePair = "BTCUSD";
+    private string _wsCandlePair = "BTCUSD";
+    private int _wsCandlePeriod = 300;
+
+    public string WsTradePair
+    {
+        get => _wsTradePair;
+        set {
+            _wsTradePair = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WsTradePair)));
+        }
+    }
+
+    public string WsCandlePair
+    {
+        get => _wsCandlePair;
+        set
+        {
+            _wsCandlePair = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WsCandlePair)));
+        }
+    }
+
+    public int WsCandlePeriod
+    {
+        get => _wsCandlePeriod;
+        set
+        {
+            _wsCandlePeriod = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(WsCandlePeriod)));
+        }
     }
     #endregion
 }

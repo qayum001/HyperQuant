@@ -53,7 +53,24 @@
                     </GridView>
                 </ListView.View>
             </ListView>
-        </StackPanel>
+
+            <Label>Trades</Label>
+            <TextBox Text="{Binding WsTradePair, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+            <Button Content="Subscribe to Trades" Command="{Binding SubscribeToTradesCommand}" Margin="5"/>
+            <Button Content="Unsubscribe" Command="{Binding UnsubscribeFromTradesCommand}" Margin="5"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10" Height="500">
+                <DataGrid ItemsSource="{Binding WsTrades}" AutoGenerateColumns="True"/>
+            </ScrollViewer>
+
+            <Label>Candles</Label>
+            <TextBox Text="{Binding WsCandlePair, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+            <TextBox Text="{Binding WsCandlePeriod, UpdateSourceTrigger=PropertyChanged}" Margin="5"/>
+            <Button Content="Subscribe to Candles" Command="{Binding SubscribeToCandlesCommand}" Margin="5"/>
+            <Button Content="Unsubscribe" Command="{Binding UnsubscribeFromCandlesCommand}" Margin="5"/>
+            <ScrollViewer VerticalScrollBarVisibility="Auto" Margin="10" Height="500">
+                <DataGrid ItemsSource="{Binding WsCandles}" AutoGenerateColumns="True"/>
+            </ScrollViewer>
+            </StackPanel>
     </Grid>
     </ScrollViewer>
 </Window>

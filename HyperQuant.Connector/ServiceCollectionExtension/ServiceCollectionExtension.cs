@@ -21,6 +21,7 @@ public static class ServiceCollectionExtension
         });
 
         services.AddTransient<IRestConnectorClient, RestConnectorClient>();
+        services.AddSingleton<IWebSocketConnectorClient, WebSocketConnectorClient>();
         services.AddTransient<ITestConnector, TestConnector>();
     }
 }

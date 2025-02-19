@@ -42,6 +42,5 @@
         /// Время
         /// </summary>
         public DateTimeOffset OpenTime { get; set; }
-
     }
 }
