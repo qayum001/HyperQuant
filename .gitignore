@@ -1,0 +1,23 @@
+# Mod (ForgeGradle)
+mod/.gradle/
+mod/build/
+mod/run/
+mod/out/
+mod/*.iml
+mod/.idea/
+mod/eclipse/
+mod/classes/
+
+# Harness
+harness/config.toml
+harness/traces/
+harness/*.egg-info/
+**/__pycache__/
+.venv/
+venv/
+.pytest_cache/
+
+# Editors / OS
+.idea/
+.vscode/
+.DS_Store

@@ -1,0 +1,47 @@
+# Copy to config.toml and adjust. Secrets can stay in environment variables instead:
+#   OPENROUTER_API_KEY  - your OpenRouter key
+#   AGENTBRIDGE_TOKEN   - the "token" value from the server's config/agentbridge.cfg
+
+[bridge]
+url = "http://127.0.0.1:8765"
+# token = "..."              # or set AGENTBRIDGE_TOKEN
+
+[llm]
+# Any OpenAI-compatible endpoint works: OpenRouter, a local Ollama ("http://localhost:11434/v1"), LM Studio...
+base_url = "https://openrouter.ai/api/v1"
+# api_key = "..."            # or set OPENROUTER_API_KEY
+timeout_s = 90
+max_retries = 3
+
+# The "brain part that handles signals from the eyes": turns raw sensor JSON into readable text.
+# A small, fast model is enough. Models are tried in order; later ones are fallbacks.
+# Free models on OpenRouter change often - list the current ones with: hq-agents models --free
+[cortex]
+mode = "llm"                 # "llm", or "rules" to skip the LLM and use the built-in text renderer
+models = ["meta-llama/llama-3.3-70b-instruct:free", "mistralai/mistral-small-3.2-24b-instruct:free"]
+temperature = 0.2
+max_tokens = 600
+
+# The decision maker: picks the next body action.
+[brain]
+models = ["deepseek/deepseek-chat-v3-0324:free", "qwen/qwen3-235b-a22b:free"]
+temperature = 0.3
+max_tokens = 900
+
+# Double-checks a "done" claim against what the agent currently sees. Uses the brain models if none are given.
+[judge]
+enabled = true
+# models = ["..."]
+
+[agent]
+spawn = ["Bob"]              # agents to log in when the harness starts
+# spawn_near = "YourName"    # first login next to this player
+max_steps = 80               # body actions per task
+max_minutes = 30
+history = 12                 # recent steps shown to the brain
+panorama_every = 6           # look all around on the first step and every N steps (0 = only first step)
+action_timeout_s = 120
+announce = true              # say "On it" / the result in chat
+
+[trace]
+dir = "traces"               # one JSONL file per task with every observation, perception, decision and outcome
