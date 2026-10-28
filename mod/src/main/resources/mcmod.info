@@ -1,0 +1,15 @@
+[
+  {
+    "modid": "agentbridge",
+    "name": "HyperQuant AgentBridge",
+    "description": "Server-side bridge that lets external AI agents play as ordinary survival players.",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "",
+    "authorList": ["HyperQuant"],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
