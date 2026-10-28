@@ -45,7 +45,7 @@ class App:
     def runner(self, name: str) -> AgentRunner:
         c = self.config
         judge = Judge(self.llm, c.judge_role) if c.judge.enabled else None
-        return AgentRunner(name, eyes=Eyes(self.bridge), cortex=self.cortex(), brain=Brain(self.llm, c.brain, name),
+        return AgentRunner(name, eyes=Eyes(self.bridge), cortex=self.cortex(), brain=Brain(self.llm, c.brain, name, c.brain.prompt_style),
                            judge=judge, body=Body(self.bridge, c.agent.action_timeout_s), settings=c.agent,
                            tracer=self.tracer)
 

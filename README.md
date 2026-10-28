@@ -11,11 +11,13 @@ you have: reach, line of sight, mining time, hunger, inventory space, permission
 
 How it works, and why it is built this way: [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 The mod's HTTP API: [docs/PROTOCOL.md](docs/PROTOCOL.md).
+Running on a local GPU (6 GB) and training your own Minecraft model: [docs/MODELS.md](docs/MODELS.md).
 
 ```
 mod/       Forge 1.12.2 server mod "AgentBridge": avatars, eyes, body, local HTTP API   (Java 8)
 harness/   The agent loop: eyes -> visual cortex (LLM) -> brain (LLM) -> body -> check  (Python 3.11+)
-docs/      Architecture and protocol
+training/  Fine-tuning a small local model on the agent's own traces
+docs/      Architecture, protocol, models
 ```
 
 ## Setup
@@ -84,6 +86,7 @@ hq-agents act Bob move_to x=100 y=64 z=-20
 hq-agents act Bob mine x=101 y=64 z=-20
 hq-agents act Bob craft item=minecraft:planks count=8
 hq-agents task Bob "get some cobblestone" --from YourName
+hq-agents dataset traces/ --out train.jsonl --val-fraction 0.1 --prompt-style compact   # training data
 ```
 
 ## Development

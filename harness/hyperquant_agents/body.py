@@ -168,6 +168,19 @@ def catalog_text() -> str:
     return "\n".join(lines)
 
 
+def compact_catalog_text() -> str:
+    """One signature per action, e.g. "mine(x, y, z, auto_tool?)"; alternatives are joined with "|"."""
+    lines = []
+    for spec in CATALOG:
+        grouped = {name for group in spec.one_of for name in group}
+        parts = []
+        if spec.one_of:
+            parts.append(" | ".join(", ".join(group) for group in spec.one_of))
+        parts += [p.name + ("" if p.required else "?") for p in spec.params if p.name not in grouped]
+        lines.append(f"{spec.name}({', '.join(parts)})")
+    return "\n".join(lines)
+
+
 @dataclass
 class Outcome:
     status: str  # success | failure | timeout | cancelled | running | invalid

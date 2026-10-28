@@ -204,6 +204,8 @@ but real modpack chores will hit the cap. Options, cheapest first:
 * a local model through Ollama or LM Studio (`base_url = "http://localhost:11434/v1"`);
 * a cheap paid model for the brain and a free one for the cortex.
 
+[MODELS.md](MODELS.md) covers local models for a 6 GB GPU and training a small model on the agent's own traces.
+
 ## Security
 
 * The API listens on `127.0.0.1` and requires a random bearer token generated on first start.

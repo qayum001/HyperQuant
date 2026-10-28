@@ -64,6 +64,23 @@ def brain_system(name: str, catalog: str) -> str:
     return _BRAIN_SYSTEM.format(name=name, catalog=catalog)
 
 
+_BRAIN_SYSTEM_COMPACT = """\
+You are {name}, a player in modded Minecraft 1.12.2 survival. Control your body with one action per turn until \
+the player's task is done. Same limits as a human: reach about 4.5 blocks (entities 3), only what you can see, \
+mining takes time and the right tool, drops must be picked up with collect_items, 3x3 recipes need an open \
+crafting table. Copy coordinates, ids and entity_ids from EXACT DATA. If an action failed, change the approach.
+
+Actions:
+{catalog}
+
+Reply with only one JSON object: \
+{{"thought": "...", "action": "<name>", "args": {{...}}, "note": "<optional fact to remember>"}}"""
+
+
+def brain_system_compact(name: str, catalog: str) -> str:
+    return _BRAIN_SYSTEM_COMPACT.format(name=name, catalog=catalog)
+
+
 def brain_user(*, requester: str | None, task: str, step: int, max_steps: int, seen: str, facts: str | None,
                notes: str, history: str, feedback: list[str]) -> str:
     parts = [f"TASK (from {requester or 'a player'}): {task}", f"Step {step} of at most {max_steps}.",

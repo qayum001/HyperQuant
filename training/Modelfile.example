@@ -1,0 +1,12 @@
+# Ollama model for a fine-tuned agent brain.
+#   ollama create minecraft-brain -f Modelfile
+# then in harness/config.toml:
+#   [llm]   base_url = "http://localhost:11434/v1"
+#   [brain] models = ["minecraft-brain"]  prompt_style = "compact"   (the style you exported the data with)
+
+# Path of the .gguf file written by train_lora.py (the exact file name depends on the Unsloth version).
+FROM ./minecraft-brain/gguf/unsloth.Q4_K_M.gguf
+
+# Ollama's default context is too small for the agent's prompts and it truncates them silently.
+PARAMETER num_ctx 8192
+PARAMETER temperature 0.3

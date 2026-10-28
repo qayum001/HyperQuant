@@ -169,12 +169,14 @@ class ScriptedLLM:
         self.cortex = cortex
         self.fail_first = dict(fail_first or {})  # model -> number of 429s to return first
         self.calls: list[tuple[str, str, list[dict[str, str]]]] = []
+        self.bodies: list[dict] = []
 
     def transport(self) -> httpx.MockTransport:
         return httpx.MockTransport(self._handle)
 
     def _handle(self, request: httpx.Request) -> httpx.Response:
         body = json.loads(request.content)
+        self.bodies.append(body)
         model = body["model"]
         if self.fail_first.get(model, 0) > 0:
             self.fail_first[model] -= 1

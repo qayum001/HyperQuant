@@ -57,7 +57,8 @@ class AgentRunner:
 
     async def run(self, task: Task) -> TaskResult:
         trace = self._tracer.start(self.name, task.text)
-        trace.write("task", agent=self.name, text=task.text, requester=task.requester, source=task.source)
+        trace.write("task", agent=self.name, text=task.text, requester=task.requester, source=task.source,
+                    system_prompt=self._brain.system_prompt)
         if self._settings.announce:
             await self._say(task, f"On it: {task.text}")
         result = TaskResult("cancelled", "the harness shut down", 0)

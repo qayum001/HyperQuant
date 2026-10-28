@@ -34,5 +34,11 @@ class Tracer:
             return TaskTrace(None)
         self._dir.mkdir(parents=True, exist_ok=True)
         slug = re.sub(r"[^a-z0-9]+", "-", task.lower()).strip("-")[:40] or "task"
-        path = self._dir / f"{time.strftime('%Y%m%d-%H%M%S')}-{agent}-{slug}.jsonl"
-        return TaskTrace(path.open("w", encoding="utf-8"))
+        base = f"{time.strftime('%Y%m%d-%H%M%S')}-{agent}-{slug}"
+        for n in range(1, 1000):
+            path = self._dir / (f"{base}.jsonl" if n == 1 else f"{base}-{n}.jsonl")
+            try:
+                return TaskTrace(path.open("x", encoding="utf-8"))  # never overwrite another task's trace
+            except FileExistsError:
+                continue
+        raise RuntimeError(f"too many traces named {base}")

@@ -60,7 +60,8 @@ class LLMClient:
         raise LLMError("all models failed: " + "; ".join(errors[-4:]))
 
     async def _complete(self, model: str, messages: list[dict[str, str]], role: ModelRole) -> str:
-        payload = {"model": model, "messages": messages, "temperature": role.temperature, "max_tokens": role.max_tokens}
+        payload = {**self._settings.extra_body, "model": model, "messages": messages,
+                   "temperature": role.temperature, "max_tokens": role.max_tokens}
         try:
             response = await self._client.post("/chat/completions", json=payload)
         except httpx.TransportError as e:
@@ -73,11 +74,15 @@ class LLMClient:
             data = response.json()
             if "error" in data:  # OpenRouter reports some upstream failures inside a 200
                 raise _Retry(str(data["error"])[:200])
-            text = data["choices"][0]["message"].get("content") or ""
+            message = data["choices"][0]["message"]
+            text = message.get("content") or ""
         except (ValueError, KeyError, IndexError, TypeError) as e:
             raise _Retry(f"malformed response: {e!r}") from e
         text = strip_reasoning(text)
         if not text.strip():
+            if message.get("reasoning") or message.get("reasoning_content"):
+                raise _Skip("the model only produced reasoning; turn thinking off for it "
+                            '(e.g. [llm] extra_body = { reasoning_effort = "none" } for Ollama)')
             raise _Retry("empty reply")
         return text
 

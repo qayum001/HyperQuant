@@ -21,3 +21,8 @@ venv/
 .idea/
 .vscode/
 .DS_Store
+
+# Training outputs
+training/minecraft-brain/
+training/outputs/
+*.gguf

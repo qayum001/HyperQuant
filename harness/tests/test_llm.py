@@ -38,3 +38,13 @@ def test_raises_when_every_model_fails():
     client = LLMClient(LLMSettings(api_key="k", max_retries=0), transport=llm.transport())
     with pytest.raises(LLMError):
         asyncio.run(client.chat([{"role": "system", "content": "x"}], ModelRole(models=["only"])))
+
+
+def test_extra_body_is_sent_with_every_request():
+    llm = ScriptedLLM(brain=['{"action": "wait"}'])
+    settings = LLMSettings(api_key="k", extra_body={"think": False, "chat_template_kwargs": {"enable_thinking": False}})
+    client = LLMClient(settings, transport=llm.transport())
+    asyncio.run(client.chat([{"role": "system", "content": "x"}], ModelRole(models=["m"])))
+    assert llm.bodies[0]["think"] is False
+    assert llm.bodies[0]["chat_template_kwargs"] == {"enable_thinking": False}
+    assert llm.bodies[0]["model"] == "m"

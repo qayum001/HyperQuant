@@ -16,6 +16,7 @@ from .app import App, Supervisor
 from .body import Body, InvalidAction, validate
 from .config import Config, load_config
 from .cortex import render_facts
+from .dataset import export
 
 
 def _config(path: str | None) -> Config:
@@ -104,6 +105,16 @@ async def _models(config: Config, free_only: bool) -> None:
             print(f"{m['id']:60} context {m.get('context_length', '?')}")
 
 
+def _dataset(args: argparse.Namespace) -> None:
+    val_out = args.val_out or (str(args.out).removesuffix(".jsonl") + ".val.jsonl" if args.val_fraction else None)
+    stats = export(args.traces, args.out, val_out=val_out, val_fraction=args.val_fraction,
+                   prompt_style=args.prompt_style, keep_failures=args.keep_failures,
+                   include_unfinished=args.include_unfinished)
+    print(f"{stats.traces} traces, {stats.tasks_used} usable tasks -> {stats.train_examples} training examples"
+          f" in {args.out}" + (f", {stats.val_examples} validation examples in {val_out}" if val_out else "")
+          + f" ({stats.skipped_steps} steps left out)")
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="hq-agents", description="LLM agents that play Minecraft as players.")
     parser.add_argument("-c", "--config", help="TOML config file (default: ./config.toml if present)")
@@ -128,6 +139,15 @@ def main(argv: list[str] | None = None) -> int:
     p.add_argument("--spawn")
     p.add_argument("--despawn")
     p.add_argument("--near")
+    p = sub.add_parser("dataset", help="turn task traces into chat fine-tuning data (JSONL)")
+    p.add_argument("traces", nargs="+", help="trace files or directories")
+    p.add_argument("--out", required=True)
+    p.add_argument("--val-fraction", type=float, default=0.0, help="share of tasks held out for validation")
+    p.add_argument("--val-out", help="validation file (default: <out>.val.jsonl)")
+    p.add_argument("--prompt-style", choices=["full", "compact"],
+                   help="re-render the system prompt (default: the one recorded in the trace)")
+    p.add_argument("--keep-failures", action="store_true", help="also keep steps whose action failed")
+    p.add_argument("--include-unfinished", action="store_true", help="also use tasks that did not end as done")
     p = sub.add_parser("models", help="list models available at the LLM endpoint")
     p.add_argument("--free", action="store_true")
     args = parser.parse_args(argv)
@@ -135,8 +155,11 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(level=logging.DEBUG if args.verbose else logging.INFO,
                         format="%(asctime)s %(levelname)s %(name)s: %(message)s", datefmt="%H:%M:%S")
     logging.getLogger("httpx").setLevel(logging.WARNING)
-    config = _config(args.config)
     command = args.command or "run"
+    if command == "dataset":  # works offline, needs no config
+        _dataset(args)
+        return 0
+    config = _config(args.config)
     try:
         if command == "run":
             asyncio.run(_run(config))

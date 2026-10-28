@@ -12,6 +12,8 @@ base_url = "https://openrouter.ai/api/v1"
 # api_key = "..."            # or set OPENROUTER_API_KEY
 timeout_s = 90
 max_retries = 3
+# Extra fields sent with every request, e.g. to turn a local model's thinking off (see docs/MODELS.md):
+# extra_body = { reasoning_effort = "none" }
 
 # The "brain part that handles signals from the eyes": turns raw sensor JSON into readable text.
 # A small, fast model is enough. Models are tried in order; later ones are fallbacks.
@@ -27,6 +29,7 @@ max_tokens = 600
 models = ["deepseek/deepseek-chat-v3-0324:free", "qwen/qwen3-235b-a22b:free"]
 temperature = 0.3
 max_tokens = 900
+prompt_style = "full"        # "compact" saves ~1,600 tokens; meant for models fine-tuned on it (docs/MODELS.md)
 
 # Double-checks a "done" claim against what the agent currently sees. Uses the brain models if none are given.
 [judge]

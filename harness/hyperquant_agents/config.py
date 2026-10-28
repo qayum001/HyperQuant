@@ -23,6 +23,8 @@ class LLMSettings:
     max_retries: int = 3
     app_name: str = "HyperQuant Agents"
     app_url: str = "https://github.com/qayum001/HyperQuant"
+    # Merged into every chat request, for server-specific switches such as turning a model's thinking off.
+    extra_body: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -32,6 +34,11 @@ class ModelRole:
     models: list[str] = field(default_factory=list)
     temperature: float = 0.3
     max_tokens: int = 800
+
+
+@dataclass
+class BrainSettings(ModelRole):
+    prompt_style: str = "full"  # "full" or "compact" (for small or fine-tuned local models)
 
 
 @dataclass
@@ -62,7 +69,7 @@ class Config:
     llm: LLMSettings = field(default_factory=LLMSettings)
     cortex: CortexSettings = field(default_factory=lambda: CortexSettings(
         models=["meta-llama/llama-3.3-70b-instruct:free"], temperature=0.2, max_tokens=600))
-    brain: ModelRole = field(default_factory=lambda: ModelRole(
+    brain: BrainSettings = field(default_factory=lambda: BrainSettings(
         models=["deepseek/deepseek-chat-v3-0324:free"], temperature=0.3, max_tokens=900))
     judge: JudgeSettings = field(default_factory=JudgeSettings)
     agent: AgentSettings = field(default_factory=AgentSettings)
@@ -106,4 +113,6 @@ def load_config(path: str | os.PathLike[str] | None = None) -> Config:
     config.bridge.token = config.bridge.token or os.environ.get("AGENTBRIDGE_TOKEN", "")
     if config.cortex.mode not in ("llm", "rules"):
         raise ValueError('[cortex] mode must be "llm" or "rules"')
+    if config.brain.prompt_style not in ("full", "compact"):
+        raise ValueError('[brain] prompt_style must be "full" or "compact"')
     return config
